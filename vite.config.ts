@@ -1,15 +1,12 @@
-import path from "path"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
-import { inspectAttr } from 'kimi-plugin-inspect-react'
+import path from "path";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
-// https://vite.dev/config/
 export default defineConfig({
-  base: './',
-  plugins: [inspectAttr(), react()],
-  server: {
-    port: 3000,
-  },
+  base: "/fastmed-website/",   // ✅ required for GitHub Pages
+
+  plugins: [react()],
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
