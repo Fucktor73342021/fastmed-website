@@ -1,5 +1,5 @@
-/* global React */
-const { useState, useEffect, useRef, useLayoutEffect } = React;
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import * as icons from 'lucide-react';
 
 /* ─── Logo mark ────────────────────────────────────────────── */
 function LogoMark({ size = 28 }) {
@@ -21,40 +21,12 @@ function Wordmark({ color = "var(--ink)" }) {
   );
 }
 
-/* ─── Lucide icon (uses lucide global) ───────────────────────── */
-function Icon({ name, size = 20, color = "currentColor", strokeWidth = 2 }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ref.current || !window.lucide) return;
-    ref.current.innerHTML = "";
-    const svg = window.lucide.createIcons({
-      icons: window.lucide.icons,
-      attrs: { width: size, height: size, "stroke-width": strokeWidth },
-      nameAttr: "data-lucide",
-    });
-  }, [name, size, strokeWidth]);
-  return (
-    <i
-      ref={ref}
-      data-lucide={name}
-      style={{ width: size, height: size, color, display: "inline-flex" }}
-    />
-  );
-}
-
-/* fallback: render lucide directly via container */
 function Lucide({ name, size = 20, color = "currentColor", strokeWidth = 2, style }) {
-  const ref = useRef(null);
-  useLayoutEffect(() => {
-    if (!ref.current || !window.lucide) return;
-    ref.current.setAttribute("data-lucide", name);
-    ref.current.setAttribute("width", size);
-    ref.current.setAttribute("height", size);
-    ref.current.setAttribute("stroke-width", strokeWidth);
-    ref.current.innerHTML = "";
-    try { window.lucide.createIcons({ nameAttr: "data-lucide" }); } catch (e) {}
-  }, [name, size, strokeWidth]);
-  return <i ref={ref} data-lucide={name} style={{ width: size, height: size, color, display: "inline-flex", ...style }} />;
+  // Convert kebab-case to PascalCase
+  const componentName = name.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('');
+  const IconComponent = icons[componentName];
+  if (!IconComponent) return null;
+  return <IconComponent size={size} color={color} strokeWidth={strokeWidth} style={style} />;
 }
 
 /* ─── 4-point sparkle SVG ────────────────────────────────────── */
@@ -134,7 +106,4 @@ function Marquee({ items, variant = "", speed = "" }) {
   );
 }
 
-/* expose */
-Object.assign(window, {
-  LogoMark, Wordmark, Lucide, Sparkle, Star, Capsule, Tablet, Reveal, Marquee,
-});
+export { LogoMark, Wordmark, Lucide, Sparkle, Star, Capsule, Tablet, Reveal, Marquee };

@@ -1,5 +1,6 @@
-/* global React, Reveal, Sparkle, Star, Capsule, Tablet, Lucide, Marquee, Phone */
-const { useState: useS_s, useEffect: useE_s } = React;
+import React, { useState as useS_s, useEffect as useE_s } from 'react';
+import { Reveal, Sparkle, Star, Capsule, Tablet, Lucide, Marquee } from './primitives.jsx';
+import { Phone } from './phone.jsx';
 
 /* ─── Marquee strip(s) ───────────────────────────────────────── */
 function MarqueeStrip() {
@@ -582,7 +583,7 @@ function FAQ() {
 }
 
 /* ─── Footer ───────────────────────────────────────────────── */
-function Footer() {
+function Footer({ onOpenLegal }) {
   return (
     <footer className="footer">
       <div className="container">
@@ -635,27 +636,23 @@ function Footer() {
               <li><a href="#">About</a></li>
               <li><a href="#">Press</a></li>
               <li><a href="#">Careers</a></li>
-              <li><a href="#">Contact</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); onOpenLegal('contact'); }}>Contact</a></li>
             </ul>
           </div>
         </div>
 
         <div className="legal">
-          <span>© 2026 FlashMed Technologies Pvt. Ltd.</span>
           <span>Connector platform · We do not sell medicine</span>
-          <span><a href="#" style={{ color: "rgba(255,255,255,0.5)" }}>Privacy</a> · <a href="#" style={{ color: "rgba(255,255,255,0.5)" }}>Terms</a> · <a href="#" style={{ color: "rgba(255,255,255,0.5)" }}>Drugs Act compliance</a></span>
+          <span>
+            <a href="#" onClick={(e) => { e.preventDefault(); onOpenLegal('privacy'); }} style={{ color: "rgba(255,255,255,0.5)" }}>Privacy</a> ·{' '}
+            <a href="#" onClick={(e) => { e.preventDefault(); onOpenLegal('terms'); }} style={{ color: "rgba(255,255,255,0.5)" }}>Terms</a> ·{' '}
+            <a href="#" onClick={(e) => { e.preventDefault(); onOpenLegal('payment'); }} style={{ color: "rgba(255,255,255,0.5)" }}>Payment & Refunds</a> ·{' '}
+            <a href="#" onClick={(e) => { e.preventDefault(); onOpenLegal('compliance'); }} style={{ color: "rgba(255,255,255,0.5)" }}>Drugs Act compliance</a>
+          </span>
         </div>
       </div>
     </footer>
   );
 }
 
-window.MarqueeStrip = MarqueeStrip;
-window.HowItWorks = HowItWorks;
-window.WhyUs = WhyUs;
-window.PhoneSection = PhoneSection;
-window.Coverage = Coverage;
-window.Partners = Partners;
-window.Download = Download;
-window.FAQ = FAQ;
-window.Footer = Footer;
+export { MarqueeStrip, HowItWorks, WhyUs, PhoneSection, Coverage, Partners, Download, FAQ, Footer };

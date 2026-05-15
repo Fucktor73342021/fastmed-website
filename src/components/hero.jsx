@@ -1,5 +1,5 @@
-/* global React, Reveal, Sparkle, Star, Capsule, Tablet, Lucide */
-const { useState: useS_h, useEffect: useE_h, useRef: useR_h } = React;
+import React, { useState as useS_h, useEffect as useE_h, useRef as useR_h } from 'react';
+import { Reveal, Sparkle, Star, Capsule, Tablet, Lucide } from './primitives.jsx';
 
 /* ─── Live 10-min countdown that resets on hit zero ──────────── */
 function useCountdown(initialSeconds = 600) {
@@ -148,4 +148,4 @@ function Hero() {
   );
 }
 
-window.Hero = Hero;
+export { Hero };

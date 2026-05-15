@@ -1,5 +1,8 @@
-/* global React, ReactDOM, LogoMark, Wordmark, Lucide, Marquee, Hero, MarqueeStrip, HowItWorks, WhyUs, PhoneSection, Coverage, Partners, Download, FAQ, Footer */
-const { useEffect: useE_a } = React;
+import React, { useState as useS_a } from 'react';
+import { LogoMark, Wordmark, Marquee } from './components/primitives.jsx';
+import { Hero } from './components/hero.jsx';
+import { HowItWorks, WhyUs, PhoneSection, Coverage, Partners, Download, FAQ, Footer } from './components/sections.jsx';
+import { LegalModal } from './components/legal.jsx';
 
 function Nav() {
   return (
@@ -26,12 +29,8 @@ function Nav() {
 }
 
 function App() {
-  useE_a(() => {
-    if (window.lucide) window.lucide.createIcons();
-    // re-run lucide on next tick to catch React-mounted icons
-    const t = setTimeout(() => window.lucide && window.lucide.createIcons(), 100);
-    return () => clearTimeout(t);
-  });
+  const [legalPage, setLegalPage] = useS_a(null);
+
 
   return (
     <div id="top">
@@ -82,10 +81,13 @@ function App() {
 
       <Download />
       <FAQ />
-      <Footer />
+      <Footer onOpenLegal={setLegalPage} />
+
+      {legalPage && (
+        <LegalModal page={legalPage} onClose={() => setLegalPage(null)} />
+      )}
     </div>
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+export default App;

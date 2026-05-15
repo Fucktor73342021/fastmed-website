@@ -1,5 +1,5 @@
-/* global React, Sparkle, Capsule, Tablet, Lucide */
-const { useState: useS_p, useEffect: useE_p } = React;
+import React, { useState as useS_p, useEffect as useE_p } from 'react';
+import { Sparkle, Capsule, Tablet, Lucide } from './primitives.jsx';
 
 /* Animated app preview phone — courier drives along a path; ETA ticks down. */
 function Phone() {
@@ -157,4 +157,4 @@ function Phone() {
   );
 }
 
-window.Phone = Phone;
+export { Phone };
