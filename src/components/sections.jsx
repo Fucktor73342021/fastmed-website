@@ -264,18 +264,18 @@ function PhoneSection() {
 /* ─── Coverage / cities ─────────────────────────────────────── */
 function Coverage() {
   const cities = [
-    { name: "Bengaluru",  x: "22%", y: "44%", v: "" },
-    { name: "Mumbai",     x: "16%", y: "30%", v: "coral" },
-    { name: "Delhi NCR",  x: "30%", y: "16%", v: "sky" },
-    { name: "Hyderabad",  x: "44%", y: "54%", v: "" },
-    { name: "Chennai",    x: "58%", y: "70%", v: "coral" },
-    { name: "Pune",       x: "22%", y: "62%", v: "sky" },
-    { name: "Kolkata",    x: "62%", y: "26%", v: "" },
-    { name: "Ahmedabad",  x: "12%", y: "20%", v: "sky" },
-    { name: "Jaipur",     x: "38%", y: "32%", v: "coral" },
-    { name: "Lucknow",    x: "52%", y: "20%", v: "" },
+    { name: "Bengaluru", x: "22%", y: "44%", v: "" },
+    { name: "Mumbai", x: "16%", y: "30%", v: "coral" },
+    { name: "Delhi NCR", x: "30%", y: "16%", v: "sky" },
+    { name: "Hyderabad", x: "44%", y: "54%", v: "" },
+    { name: "Chennai", x: "58%", y: "70%", v: "coral" },
+    { name: "Pune", x: "22%", y: "62%", v: "sky" },
+    { name: "Kolkata", x: "62%", y: "26%", v: "" },
+    { name: "Ahmedabad", x: "12%", y: "20%", v: "sky" },
+    { name: "Jaipur", x: "38%", y: "32%", v: "coral" },
+    { name: "Lucknow", x: "52%", y: "20%", v: "" },
     { name: "Coimbatore", x: "70%", y: "62%", v: "sky" },
-    { name: "Indore",     x: "32%", y: "48%", v: "coral" },
+    { name: "Indore", x: "32%", y: "48%", v: "coral" },
   ];
 
   return (
@@ -456,7 +456,7 @@ function Download() {
                 }}>
                   <div>
                     <div style={{ fontSize: 10, fontFamily: "var(--mono)", letterSpacing: "0.18em" }}>FREE</div>
-                    <div style={{ fontSize: 18, marginTop: 2 }}>1st<br/>drop</div>
+                    <div style={{ fontSize: 18, marginTop: 2 }}>1st<br />drop</div>
                   </div>
                 </div>
               </div>
@@ -478,10 +478,10 @@ function QRBlock() {
       (x < 7 && y < 7) || (x >= N - 7 && y < 7) || (x < 7 && y >= N - 7);
     const v = isCorner
       ? (
-          (x === 0 || x === 6 || y === 0 || y === 6) ||
+        (x === 0 || x === 6 || y === 0 || y === 6) ||
           (x >= 2 && x <= 4 && y >= 2 && y <= 4)
-            ? 1 : 0
-        )
+          ? 1 : 0
+      )
         ? 1 : 0
       : seed(x * N + y) > 0.55 ? 1 : 0;
     if (v) cells.push([x, y]);
@@ -499,7 +499,7 @@ function QRBlock() {
       <rect width={N} height={N} fill="#fff" />
       {cells.map(([x, y], i) => (
         (x < 7 && y < 7) || (x >= N - 7 && y < 7) || (x < 7 && y >= N - 7) ? null :
-        <rect key={i} x={x} y={y} width="1" height="1" fill="var(--ink)" />
+          <rect key={i} x={x} y={y} width="1" height="1" fill="var(--ink)" />
       ))}
       {finder(0, 0)}
       {finder(N - 7, 0)}
@@ -525,7 +525,7 @@ function FAQ() {
     },
     {
       q: "What if you miss the 10-minute promise?",
-      a: "Within city service zones, if your order takes longer than 10 minutes from confirmation to door, the delivery is free. Auto-applied — no support ticket needed.",
+      a: "The 10-minute goal is a benchmark for speed — not pressure. We never expect our delivery partners to risk their safety or break traffic rules. Delays due to traffic, weather, safety, or pharmacy preparation can happen, and responsible delivery always comes first.",
     },
     {
       q: "How are prices set?",
