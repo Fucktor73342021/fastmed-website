@@ -529,7 +529,7 @@ function FAQ() {
     },
     {
       q: "How are prices set?",
-      a: "All medicine is sold at the printed MRP — same price you'd pay at the counter. We charge a flat ₹19 delivery fee, waived on your first order and on orders over ₹299.",
+      a: "Medicine pricing is set independently by each pharmacy partner according to their own discount policies. FlashMed may add extra platform offers on eligible orders, while delivery charges vary based on distance and location.",
     },
     {
       q: "Cold-chain items — insulin, vaccines?",
