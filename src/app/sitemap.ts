@@ -8,5 +8,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/login`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/register`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/forgot-password`, lastModified: now, changeFrequency: 'monthly', priority: 0.3 },
+    { url: `${base}/privacy-policy`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${base}/terms-and-conditions`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${base}/refund-policy`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${base}/rider-privacy-policy`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${base}/delete-account`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
   ];
 }
