@@ -217,7 +217,8 @@ export default function middleware(req: NextRequest) {
   /* ── Auth guard at the edge ── */
   const isAuthRoute = AUTH_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
   if (isAuthRoute) {
-    const token = req.cookies.get('fm_token')?.value;
+    const rawToken = req.cookies.get('fm_token')?.value;
+    const token = rawToken ? decodeURIComponent(rawToken) : null;
     if (!token) {
       const loginUrl = req.nextUrl.clone();
       loginUrl.pathname = '/login';

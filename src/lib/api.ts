@@ -8,11 +8,16 @@ function getToken(): string | null {
 
 export function setToken(token: string) {
   localStorage.setItem('fm_token', token);
+  // Also set a cookie so the edge middleware auth guard can read it
+  const secure = location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `fm_token=${encodeURIComponent(token)}; Path=/; SameSite=Lax; Max-Age=604800${secure}`;
 }
 
 export function clearToken() {
   localStorage.removeItem('fm_token');
   localStorage.removeItem('fm_user');
+  // Clear the cookie too
+  document.cookie = 'fm_token=; Path=/; Max-Age=0; SameSite=Lax';
 }
 
 async function request<T>(
