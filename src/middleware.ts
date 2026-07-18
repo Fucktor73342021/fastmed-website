@@ -121,7 +121,7 @@ function applySecurityHeaders(res: NextResponse): NextResponse {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https://*.flashmed.in https://firebasestorage.googleapis.com https://s3.amazonaws.com https://*.tile.openstreetmap.org",
-    "connect-src 'self' https://api.flashmed.in https://*.googleapis.com https://firestore.googleapis.com wss://*.firebaseio.com https://nominatim.openstreetmap.org",
+    "connect-src 'self' https://api.flashmed.in https://*.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com wss://*.firebaseio.com https://nominatim.openstreetmap.org",
     "frame-src 'none'",
     "object-src 'none'",
     "base-uri 'self'",

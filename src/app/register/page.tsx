@@ -69,7 +69,7 @@ export default function RegisterPage() {
       const data = await res.json().catch(() => ({ error: 'Registration failed' }));
       if (!res.ok) { setError(data.error || 'Registration failed. Please try again.'); return; }
       setToken(data.token);
-      setUser({ uid: 'user_' + form.phone, phoneNumber: '+91' + form.phone, ...data.user, token: data.token });
+      setUser({ uid: 'user_' + form.phone, phoneNumber: '+91' + form.phone, ...data.user, token: data.token, firebaseToken: data.firebaseToken });
       router.replace('/home');
     } catch {
       setError('Connection error. Please try again.');

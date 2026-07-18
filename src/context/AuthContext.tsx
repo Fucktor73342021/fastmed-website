@@ -1,6 +1,8 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { setToken, clearToken } from '../lib/api';
+import { auth } from '../lib/firebase';
+import { signInWithCustomToken, signOut } from 'firebase/auth';
 
 interface UserData {
   uid: string;
@@ -10,6 +12,7 @@ interface UserData {
   email?: string;
   role?: string;
   token?: string;
+  firebaseToken?: string;
   referralCode?: string;
   homeAddress?: AddressData;
   workAddress?: AddressData;
@@ -41,6 +44,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+/** Sign into Firebase Auth with custom token so Firestore security rules pass */
+async function signInToFirebase(firebaseToken?: string) {
+  if (!firebaseToken) return;
+  try {
+    await signInWithCustomToken(auth, firebaseToken);
+  } catch (e) {
+    // Non-fatal — Firestore will work if rules allow the uid pattern
+    console.warn('[Auth] signInWithCustomToken failed (non-fatal):', e);
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,6 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (stored && token) {
         const userData = JSON.parse(stored) as UserData;
         setUserState(userData);
+        // Re-sign into Firebase on session restore
+        if (userData.firebaseToken) {
+          signInToFirebase(userData.firebaseToken);
+        }
       }
     } catch { /* ignore */ }
     setIsLoading(false);
@@ -62,6 +80,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (userData) {
       localStorage.setItem('fm_user', JSON.stringify(userData));
       if (userData.token) setToken(userData.token);
+      // Sign into Firebase so Firestore rules pass
+      if (userData.firebaseToken) {
+        signInToFirebase(userData.firebaseToken);
+      }
     } else {
       clearToken();
     }
@@ -70,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUserState(null);
     clearToken();
+    try { signOut(auth); } catch { /* ignore */ }
   };
 
   return (

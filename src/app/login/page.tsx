@@ -41,7 +41,7 @@ export default function LoginPage() {
         return;
       }
       setToken(data.token);
-      setUser({ uid: 'user_' + phone, phoneNumber: '+91' + phone, ...userData, token: data.token });
+      setUser({ uid: 'user_' + phone, phoneNumber: '+91' + phone, ...userData, token: data.token, firebaseToken: data.firebaseToken });
       router.replace('/home');
     } catch {
       setError('Connection error. Please check your internet and try again.');
@@ -83,7 +83,7 @@ export default function LoginPage() {
       if (!res.ok) { setError(data.error || 'Incorrect OTP. Please try again.'); return; }
       const userData = data.user;
       setToken(data.token);
-      setUser({ uid: 'user_' + phone, phoneNumber: '+91' + phone, ...userData, token: data.token });
+      setUser({ uid: 'user_' + phone, phoneNumber: '+91' + phone, ...userData, token: data.token, firebaseToken: data.firebaseToken });
       router.replace('/home');
     } catch {
       setError('Connection error. Please try again.');
