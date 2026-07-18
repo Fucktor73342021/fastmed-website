@@ -1,10 +1,16 @@
 /**
- * Firebase Singleton — initialized once per process.
- * Prevents "Firebase App named '[DEFAULT]' already exists" on hot reload.
+ * Firebase Singleton — client-side only initialization.
+ *
+ * Firebase SDK is browser-only. During Next.js static generation the code
+ * runs on the server (no browser), causing "Service firestore is not available".
+ * We guard all initialization with `typeof window !== 'undefined'` so the
+ * server gets safe null-casted stubs while the browser gets real instances.
+ * All actual Firebase usage is inside useEffect hooks (client-only), so the
+ * null stubs are never actually called on the server.
  */
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore, enableNetwork, disableNetwork, connectFirestoreEmulator } from 'firebase/firestore';
-import { getAuth, Auth } from 'firebase/auth';
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getAuth, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY     || 'AIzaSyCxuP9VVBeMq-9tIgq_fh_PIDNpK6GIoxY',
@@ -15,19 +21,17 @@ const firebaseConfig = {
   appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID      || '1:695143432697:web:7ab47a0aff1afe77736979',
 };
 
-// Singleton pattern — safe for Next.js hot reload and Vercel serverless
-const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+// Only initialize Firebase on the client — server gets null stubs
+const isClient = typeof window !== 'undefined';
 
-export const db: Firestore = getFirestore(app);
-export const auth: Auth = getAuth(app);
+const app: FirebaseApp = isClient
+  ? (getApps().length === 0 ? initializeApp(firebaseConfig) : getApp())
+  : (null as unknown as FirebaseApp);
 
-// Connect to emulator in development only
-if (
-  typeof window !== 'undefined' &&
-  process.env.NODE_ENV === 'development' &&
-  process.env.NEXT_PUBLIC_USE_EMULATOR === 'true'
-) {
-  connectFirestoreEmulator(db, 'localhost', 8080);
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const db: Firestore = isClient ? getFirestore(app) : (null as any);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const auth: Auth    = isClient ? getAuth(app)      : (null as any);
 
 export default app;
+

@@ -46,7 +46,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 /** Sign into Firebase Auth with custom token so Firestore security rules pass */
 async function signInToFirebase(firebaseToken?: string) {
-  if (!firebaseToken) return;
+  if (!firebaseToken || typeof window === 'undefined') return;
   try {
     await signInWithCustomToken(auth, firebaseToken);
   } catch (e) {
