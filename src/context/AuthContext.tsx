@@ -1,8 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { setToken, clearToken } from '../lib/api';
-import { auth } from '../lib/firebase';
-import { signInWithCustomToken, signOut } from 'firebase/auth';
 
 interface UserData {
   uid: string;
@@ -44,15 +42,27 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-/** Sign into Firebase Auth with custom token so Firestore security rules pass */
+/** Sign into Firebase Auth with custom token so Firestore security rules pass.
+ *  Uses dynamic import so Firebase is never evaluated server-side. */
 async function signInToFirebase(firebaseToken?: string) {
   if (!firebaseToken || typeof window === 'undefined') return;
   try {
-    await signInWithCustomToken(auth, firebaseToken);
+    const { auth } = await import('../lib/firebase');
+    const { signInWithCustomToken } = await import('firebase/auth');
+    if (auth) await signInWithCustomToken(auth, firebaseToken);
   } catch (e) {
-    // Non-fatal — Firestore will work if rules allow the uid pattern
     console.warn('[Auth] signInWithCustomToken failed (non-fatal):', e);
   }
+}
+
+/** Sign out of Firebase Auth */
+async function signOutFirebase() {
+  if (typeof window === 'undefined') return;
+  try {
+    const { auth } = await import('../lib/firebase');
+    const { signOut } = await import('firebase/auth');
+    if (auth) await signOut(auth);
+  } catch { /* ignore */ }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -92,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUserState(null);
     clearToken();
-    try { signOut(auth); } catch { /* ignore */ }
+    signOutFirebase();
   };
 
   return (
