@@ -88,6 +88,14 @@ const BOT_PATTERNS = [
 const AUTH_ROUTES = ['/home', '/orders', '/doctor', '/blood-sos', '/profile', '/wallet', '/referral', '/subscription', '/notifications'];
 const PUBLIC_ROUTES = ['/', '/login', '/register', '/forgot-password'];
 
+/* ── Always-public routes: deep links + assetlinks (no auth, no rate limit) ── */
+const ALWAYS_PUBLIC_PREFIXES = [
+  '/d/',
+  '/c/',
+  '/p/',
+  '/.well-known/',
+];
+
 /* ── Security headers ─────────────────────────────────────────── */
 function applySecurityHeaders(res: NextResponse): NextResponse {
   // HSTS — tell browsers to always use HTTPS for 1 year
@@ -168,6 +176,14 @@ export default function middleware(req: NextRequest) {
   if (req.method === 'OPTIONS') {
     const res = new NextResponse(null, { status: 204 });
     return applySecurityHeaders(handleCors(req, res));
+  }
+
+  /* ── Always-public bypass (deep links + assetlinks.json) ── */
+  if (ALWAYS_PUBLIC_PREFIXES.some(p => pathname.startsWith(p))) {
+    const res = NextResponse.next();
+    // Still add security headers but skip auth + rate limits
+    res.headers.set('Cache-Control', pathname.startsWith('/.well-known/') ? 'public, max-age=3600' : 'no-store');
+    return res;
   }
 
   /* ── Bot blocking ── */
