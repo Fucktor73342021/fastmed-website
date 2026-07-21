@@ -1,50 +1,91 @@
 'use client';
 
 /**
- * DeepLinkBridge.tsx — FlashMed
+ * DeepLinkBridge.tsx — FlashMed Production Deep Link Bridge
  * ════════════════════════════════════════════════════════════════════
  *
- * Production-grade deep-link bridge page served from flashmed.in
+ * MULTI-STRATEGY APPROACH (2026 production-grade):
  *
- * HOW IT WORKS:
- * ─────────────
- * When Android App Links verification passes (correct fingerprint in assetlinks.json):
- *   → Android intercepts the URL BEFORE the browser opens → app opens directly
- *   → This page is NEVER shown.
+ * Strategy 1 — Android App Links (BEST):
+ *   When assetlinks.json verification passes, Android intercepts
+ *   https://flashmed.in/d/{id} BEFORE this page ever loads.
+ *   This page is never shown. Zero friction.
  *
- * When verification fails OR user is on a device without the app:
- *   → Browser shows this page
- *   → JS immediately fires intent://... URL (package-name based, no assetlinks needed)
- *   → If FlashMed app installed → opens directly to the correct profile screen
- *   → If NOT installed → auto-redirects to Play Store
- *   → Manual buttons are also shown after 2 seconds as fallback
+ * Strategy 2 — Custom scheme via <a> click (WORKS WITHOUT assetlinks):
+ *   window.location.href = 'flashmed://d/3852d613...'
+ *   The app manifest declares scheme=flashmed → Android opens app directly.
+ *   NO assetlinks.json verification needed.
+ *   This fires on page load automatically.
+ *
+ * Strategy 3 — intent:// URL (Chrome-specific fallback):
+ *   intent://d/3852d613#Intent;scheme=flashmed;package=in.flashmed.app;end
+ *   Chrome handles this and launches the matching app.
+ *
+ * Strategy 4 — Manual "Open in App" button:
+ *   Shown after 2.5s if app-open didn't happen (means app not installed).
+ *
+ * WHY STRATEGY 2 IS THE KEY FIX:
+ *   The custom scheme 'flashmed://d/3852d613...' maps directly to:
+ *     DEEP_LINK_CONFIG: { path: 'd/:doctorId' }
+ *   which React Navigation handles natively — no assetlinks needed.
+ *   Previously we were using 'flashmed://doctor/ID' which mapped to
+ *   DoctorProfile2 (alias screen) — now we use 'd/ID' which maps
+ *   directly to DoctorProfile (primary screen), more reliable.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const PACKAGE_NAME   = 'in.flashmed.app';
 const PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${PACKAGE_NAME}`;
 
 type ProviderType = 'doctor' | 'clinic' | 'pharmacy';
+// Short path prefix as used in HTTPS URL and deep link config
+type ProviderPrefix = 'd' | 'c' | 'p';
+
+const PREFIX_MAP: Record<ProviderType, ProviderPrefix> = {
+  doctor: 'd',
+  clinic: 'c',
+  pharmacy: 'p',
+};
+
+const LABEL_MAP: Record<ProviderType, string> = {
+  doctor:   'book this doctor',
+  clinic:   'book at this clinic',
+  pharmacy: 'order from this pharmacy',
+};
 
 interface Props {
   type: ProviderType;
   id: string;
   ctaLabel: string;
-  intentPath: string; // e.g. "doctor/abc123"
+  intentPath: string; // UNUSED — kept for API compat, we compute URLs internally now
 }
 
-function getInstallLabel(type: ProviderType): string {
-  switch (type) {
-    case 'doctor':   return 'book this doctor';
-    case 'clinic':   return 'book at this clinic';
-    case 'pharmacy': return 'order from this pharmacy';
-  }
-}
-
-export default function DeepLinkBridge({ type, id, ctaLabel, intentPath }: Props) {
-  const [showFallback, setShowFallback] = useState(false);
+export default function DeepLinkBridge({ type, id, ctaLabel }: Props) {
+  const [phase, setPhase] = useState<'loading' | 'fallback'>('loading');
   const [deviceType, setDeviceType] = useState<'android' | 'ios' | 'other'>('other');
+  const hiddenLinkRef = useRef<HTMLAnchorElement>(null);
+
+  // The SHORT prefix path ('d', 'c', 'p') matches the React Navigation
+  // DEEP_LINK_CONFIG: { path: 'd/:doctorId' } etc.
+  // This is what the app is ACTUALLY configured to handle.
+  const prefix = PREFIX_MAP[type];
+  const safeId = encodeURIComponent(id);
+
+  // Custom scheme: flashmed://d/3852d613...
+  // Matches AndroidManifest: android:scheme="flashmed"
+  // Matches DEEP_LINK_CONFIG: path: 'd/:doctorId'
+  const customSchemeUrl = `flashmed://${prefix}/${safeId}`;
+
+  // Referrer for Play Store attribution
+  const referrer = encodeURIComponent(
+    `utm_source=deeplink&utm_medium=share&utm_content=${type}_${id}`
+  );
+  const playUrl = `${PLAY_STORE_URL}&referrer=${referrer}`;
+
+  // intent:// for Chrome — secondary strategy
+  // Note: browser_fallback_url points to Play Store (not our page, avoids loops)
+  const intentUrl = `intent://${prefix}/${safeId}#Intent;scheme=flashmed;package=${PACKAGE_NAME};S.browser_fallback_url=${encodeURIComponent(playUrl)};end`;
 
   useEffect(() => {
     const ua = navigator.userAgent.toLowerCase();
@@ -55,159 +96,217 @@ export default function DeepLinkBridge({ type, id, ctaLabel, intentPath }: Props
     else if (isiOS) setDeviceType('ios');
     else            setDeviceType('other');
 
-    const referrer  = encodeURIComponent(
-      `utm_source=deeplink&utm_medium=share&utm_content=${type}_${id}`
-    );
-    const playUrl   = `${PLAY_STORE_URL}&referrer=${referrer}`;
-    const intentUrl = `intent://${intentPath}#Intent;scheme=flashmed;package=${PACKAGE_NAME};S.browser_fallback_url=${encodeURIComponent(playUrl)};end`;
-    const customUrl = `flashmed://${intentPath}`;
-
     if (isAndroid) {
-      // intent:// opens app via package name — no assetlinks.json required
-      // browser_fallback_url kicks in automatically if app is not installed
-      try { window.location.href = intentUrl; } catch (_) {}
-      // Show manual button after 2.5 s in case auto-redirect stalls
-      setTimeout(() => setShowFallback(true), 2500);
-    } else if (isiOS) {
-      try { window.location.href = customUrl; } catch (_) {}
-      setTimeout(() => setShowFallback(true), 1500);
-    } else {
-      // Desktop — just show the Play Store button
-      setShowFallback(true);
-    }
-  }, [id, intentPath, type]);
+      // ──── Strategy A: custom scheme via location change ────
+      // Works with ANY browser on Android (Chrome, Firefox, Samsung).
+      // Android routes flashmed:// to registered app immediately.
+      // If app is NOT installed: Android shows "No app found" briefly,
+      // then our setTimeout fallback catches it.
+      try {
+        window.location.href = customSchemeUrl;
+      } catch (_) { /* silent */ }
 
-  const referrer  = encodeURIComponent(
-    `utm_source=deeplink&utm_medium=share&utm_content=${type}_${id}`
-  );
-  const playUrl   = `${PLAY_STORE_URL}&referrer=${referrer}`;
-  const intentUrl = `intent://${intentPath}#Intent;scheme=flashmed;package=${PACKAGE_NAME};S.browser_fallback_url=${encodeURIComponent(playUrl)};end`;
+      // ──── Strategy B: intent:// via hidden anchor click ────
+      // Chrome-specific. Belt-and-suspenders after Strategy A.
+      // Fires 100ms later to give Strategy A a chance first.
+      const intentTimer = setTimeout(() => {
+        try {
+          if (hiddenLinkRef.current) {
+            hiddenLinkRef.current.click();
+          }
+        } catch (_) { /* silent */ }
+      }, 100);
+
+      // ──── Show manual fallback buttons after 2.5s ────
+      // If we're still here after 2.5s, the app is not installed.
+      const fallbackTimer = setTimeout(() => setPhase('fallback'), 2500);
+
+      return () => {
+        clearTimeout(intentTimer);
+        clearTimeout(fallbackTimer);
+      };
+    } else if (isiOS) {
+      // iOS custom scheme
+      try { window.location.href = customSchemeUrl; } catch (_) {}
+      const t = setTimeout(() => setPhase('fallback'), 1500);
+      return () => clearTimeout(t);
+    } else {
+      // Desktop
+      setPhase('fallback');
+    }
+  }, [customSchemeUrl, intentUrl]);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #1976D2 100%)',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      padding: '20px',
-    }}>
+    <>
+      {/* Hidden anchor for intent:// — clicked programmatically */}
+      {/* eslint-disable-next-line jsx-a11y/anchor-has-content */}
+      <a
+        ref={hiddenLinkRef}
+        href={intentUrl}
+        style={{ display: 'none', position: 'absolute', pointerEvents: 'none' }}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+
       <div style={{
-        background: 'rgba(255,255,255,0.12)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderRadius: 24,
-        padding: '40px 28px',
-        maxWidth: 400,
-        width: '100%',
-        textAlign: 'center',
-        border: '1px solid rgba(255,255,255,0.2)',
-        boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
-        color: '#fff',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0D47A1 0%, #1565C0 55%, #1976D2 100%)',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        padding: '20px',
+        boxSizing: 'border-box',
       }}>
-        {/* Branding */}
-        <div style={{ fontSize: 52, marginBottom: 8 }}>⚡</div>
-        <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: 1, marginBottom: 4 }}>
-          FlashMed
-        </div>
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginBottom: 32 }}>
-          Your Trusted Healthcare Platform
-        </div>
+        <div style={{
+          background: 'rgba(255,255,255,0.13)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRadius: 28,
+          padding: '44px 32px',
+          maxWidth: 400,
+          width: '100%',
+          textAlign: 'center',
+          border: '1px solid rgba(255,255,255,0.22)',
+          boxShadow: '0 28px 72px rgba(0,0,0,0.35)',
+          color: '#fff',
+          boxSizing: 'border-box',
+        }}>
 
-        {/* Spinner / Status */}
-        {!showFallback ? (
-          <>
-            <div style={{
-              width: 48, height: 48,
-              border: '4px solid rgba(255,255,255,0.25)',
-              borderTopColor: '#fff',
-              borderRadius: '50%',
-              animation: 'spin 0.9s linear infinite',
-              margin: '0 auto 20px',
-            }} />
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>
-              Opening app…
-            </div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5 }}>
-              {ctaLabel}
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Primary CTA — open/install app */}
-            {deviceType === 'android' && (
-              <a
-                href={intentUrl}
-                style={{
-                  display: 'block',
-                  background: '#FFFFFF',
-                  color: '#1565C0',
-                  fontWeight: 900,
-                  fontSize: 17,
-                  padding: '18px 20px',
-                  borderRadius: 16,
-                  textDecoration: 'none',
-                  marginBottom: 12,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
-                  letterSpacing: 0.3,
-                }}
-              >
-                📱 Open in FlashMed App
+          {/* Brand */}
+          <div style={{ fontSize: 56, marginBottom: 8, lineHeight: 1 }}>⚡</div>
+          <div style={{ fontSize: 30, fontWeight: 900, letterSpacing: 0.5, marginBottom: 4 }}>
+            FlashMed
+          </div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.62)', marginBottom: 36, lineHeight: 1.4 }}>
+            Your Trusted Healthcare Platform
+          </div>
+
+          {phase === 'loading' ? (
+            /* ── Loading phase: opening app ── */
+            <>
+              <Spinner />
+              <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 10 }}>
+                Opening FlashMed…
+              </div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6 }}>
+                {ctaLabel}
+              </div>
+              {deviceType === 'android' && (
+                <div style={{ marginTop: 28 }}>
+                  <a
+                    href={customSchemeUrl}
+                    style={btnStyle}
+                    onClick={(e) => {
+                      // If user taps this during loading phase, try again
+                      e.preventDefault();
+                      window.location.href = customSchemeUrl;
+                    }}
+                  >
+                    Tap to Open App
+                  </a>
+                </div>
+              )}
+            </>
+          ) : (
+            /* ── Fallback phase: app not installed or wrong OS ── */
+            <>
+              {deviceType === 'android' && (
+                <>
+                  <a href={customSchemeUrl} style={btnStyle}>
+                    📱 Open in FlashMed App
+                  </a>
+                  <div style={dividerStyle}>already have the app? tap above</div>
+                </>
+              )}
+
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>
+                {deviceType === 'android'
+                  ? `Download to ${LABEL_MAP[type]}`
+                  : deviceType === 'ios'
+                  ? 'FlashMed is on Android'
+                  : 'Get FlashMed'}
+              </div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 22, lineHeight: 1.5 }}>
+                {deviceType === 'android'
+                  ? 'Install the free app to ' + LABEL_MAP[type] + ' and much more!'
+                  : 'Download for free from the Google Play Store.'}
+              </div>
+
+              <a href={playUrl} style={outlineBtnStyle}>
+                ⬇️ Download FlashMed Free
               </a>
-            )}
 
-            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>
-              {deviceType === 'android'
-                ? 'App not installed?'
-                : deviceType === 'ios'
-                ? 'FlashMed is available on Android'
-                : 'Get FlashMed on Android'}
-            </div>
-            <div style={{
-              fontSize: 13, color: 'rgba(255,255,255,0.65)',
-              marginBottom: 20, lineHeight: 1.5,
-            }}>
-              {deviceType === 'android'
-                ? `Install the free app to ${getInstallLabel(type)} and much more!`
-                : 'Download for free from the Google Play Store.'}
-            </div>
-
-            <a
-              href={playUrl}
-              style={{
-                display: 'block',
-                background: 'transparent',
-                color: '#fff',
-                fontWeight: 700,
-                fontSize: 15,
-                padding: '15px 20px',
-                borderRadius: 16,
-                textDecoration: 'none',
-                border: '2px solid rgba(255,255,255,0.45)',
-                marginBottom: 0,
-              }}
-            >
-              ⬇️ Download FlashMed Free
-            </a>
-
-            {/* URL preview */}
-            <div style={{
-              marginTop: 24,
-              padding: '10px 14px',
-              background: 'rgba(0,0,0,0.2)',
-              borderRadius: 10,
-              fontSize: 11,
-              color: 'rgba(255,255,255,0.4)',
-              wordBreak: 'break-all',
-              lineHeight: 1.5,
-            }}>
-              🌐 flashmed.in/{type === 'doctor' ? 'd' : type === 'clinic' ? 'c' : 'p'}/{id.slice(0, 20)}…
-            </div>
-          </>
-        )}
+              {/* URL debug preview */}
+              <div style={{
+                marginTop: 24,
+                padding: '10px 14px',
+                background: 'rgba(0,0,0,0.18)',
+                borderRadius: 10,
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.35)',
+                wordBreak: 'break-all',
+                lineHeight: 1.5,
+              }}>
+                🔗 flashmed.in/{prefix}/{id.slice(0, 18)}…
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
+
+function Spinner() {
+  return (
+    <>
+      <style>{`
+        @keyframes fm-spin { to { transform: rotate(360deg); } }
+        .fm-spinner {
+          width: 48px; height: 48px;
+          border: 4px solid rgba(255,255,255,0.25);
+          border-top-color: #ffffff;
+          border-radius: 50%;
+          animation: fm-spin 0.85s linear infinite;
+          margin: 0 auto 22px;
+        }
+      `}</style>
+      <div className="fm-spinner" />
+    </>
+  );
+}
+
+const btnStyle: React.CSSProperties = {
+  display: 'block',
+  background: '#FFFFFF',
+  color: '#1565C0',
+  fontWeight: 900,
+  fontSize: 17,
+  padding: '18px 24px',
+  borderRadius: 18,
+  textDecoration: 'none',
+  marginBottom: 14,
+  boxShadow: '0 6px 24px rgba(0,0,0,0.28)',
+  letterSpacing: 0.2,
+  cursor: 'pointer',
+};
+
+const outlineBtnStyle: React.CSSProperties = {
+  display: 'block',
+  background: 'transparent',
+  color: '#FFFFFF',
+  fontWeight: 700,
+  fontSize: 15,
+  padding: '15px 20px',
+  borderRadius: 16,
+  textDecoration: 'none',
+  border: '2px solid rgba(255,255,255,0.42)',
+};
+
+const dividerStyle: React.CSSProperties = {
+  fontSize: 11,
+  color: 'rgba(255,255,255,0.38)',
+  marginBottom: 18,
+  letterSpacing: 0.3,
+};
