@@ -28,7 +28,7 @@ interface Article {
 async function fetchArticles(page = 1): Promise<{ data: Article[]; meta: { total: number; totalPages: number } }> {
   try {
     const res = await fetch(`${API_BASE}/api/marketing/articles?page=${page}&limit=12`, {
-      next: { revalidate: 300 }, // ISR — revalidate every 5 minutes
+      next: { revalidate: 60 }, // ISR — revalidate every 60 seconds
     });
     if (!res.ok) return { data: [], meta: { total: 0, totalPages: 0 } };
     return res.json();
