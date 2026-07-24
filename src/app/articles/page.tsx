@@ -29,11 +29,18 @@ interface Article {
 }
 
 async function fetchArticles(page = 1): Promise<{ data: Article[]; meta: { total: number; totalPages: number } }> {
-  const apiUrl = 'https://api.flashmed.in';
+  // Use direct Railway URL server-side to bypass Cloudflare bot protection
+  // BACKEND_URL = direct Railway URL (no CF proxy); fallback to api.flashmed.in
+  const serverApiUrl = process.env.BACKEND_URL || 'https://medicine-app-backend-production.up.railway.app';
   try {
-    const res = await fetch(`${apiUrl}/api/marketing/articles?page=${page}&limit=12`, {
+    const res = await fetch(`${serverApiUrl}/api/marketing/articles?page=${page}&limit=12`, {
       next: { revalidate: 0 },
       cache: 'no-store',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'FlashMed-Web/1.0 (+https://flashmed.in)',
+        'X-Requested-From': 'flashmed-patient-web',
+      },
     });
     if (!res.ok) {
       console.error(`[Articles] API returned ${res.status}: ${await res.text().catch(() => '')}`);

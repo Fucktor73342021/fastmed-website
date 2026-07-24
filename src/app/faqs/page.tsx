@@ -29,8 +29,9 @@ interface FAQ {
 }
 
 async function fetchFaqs(): Promise<{ data: FAQ[] }> {
+  const serverApiUrl = process.env.BACKEND_URL || 'https://medicine-app-backend-production.up.railway.app';
   try {
-    const res = await fetch(`${API_BASE}/api/marketing/faqs?limit=50`, {
+    const res = await fetch(`${serverApiUrl}/api/marketing/faqs?limit=50`, {
       next: { revalidate: 0 },
       cache: 'no-store',
     });

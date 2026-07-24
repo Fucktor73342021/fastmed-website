@@ -30,8 +30,9 @@ interface Vlog {
 }
 
 async function fetchVlogs(page = 1): Promise<{ data: Vlog[]; meta: { total: number; totalPages: number } }> {
+  const serverApiUrl = process.env.BACKEND_URL || 'https://medicine-app-backend-production.up.railway.app';
   try {
-    const res = await fetch(`${API_BASE}/api/marketing/vlogs?page=${page}&limit=12`, {
+    const res = await fetch(`${serverApiUrl}/api/marketing/vlogs?page=${page}&limit=12`, {
       next: { revalidate: 0 },
       cache: 'no-store',
     });
