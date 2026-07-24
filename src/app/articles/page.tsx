@@ -132,14 +132,6 @@ export default async function ArticlesPage() {
                 overflow: 'hidden',
                 transition: 'transform 0.2s, border-color 0.2s',
               }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
-                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(16,185,129,0.3)';
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)';
-                }}
               >
                 {article.photos?.[0] && (
                   <div style={{ width: '100%', height: 200, overflow: 'hidden' }}>
