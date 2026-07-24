@@ -3,9 +3,10 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
-// ISR: Re-render article pages at most every hour.
-// This lets Google get fast, pre-rendered HTML without going fully static.
-export const revalidate = 3600;
+// force-dynamic: article detail pages fetch live data per request.
+// ISR was causing 404s during Vercel build when Railway backend was unreachable.
+export const dynamic = 'force-dynamic';
+
 
 const SERVER_API = process.env.BACKEND_URL || 'https://medicine-app-backend-production.up.railway.app';
 const SITE_URL = 'https://flashmed.in';
@@ -26,7 +27,7 @@ interface Article {
 async function fetchArticle(slugOrId: string): Promise<Article | null> {
   try {
     const res = await fetch(`${SERVER_API}/api/marketing/articles/${slugOrId}`, {
-      next: { revalidate: 3600 },
+      cache: 'no-store',
       headers: { 'Accept': 'application/json' },
     });
     if (!res.ok) return null;
