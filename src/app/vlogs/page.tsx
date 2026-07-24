@@ -5,21 +5,27 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Health Vlogs | FlashMed',
   description: 'Watch health vlogs and medical video content from the FlashMed team. Pharmacy tips, doctor advice, and wellness guides.',
+  alternates: {
+    canonical: 'https://flashmed.in/vlogs',
+  },
   openGraph: {
     title: 'Health Vlogs | FlashMed',
     description: 'Health and medical video content from FlashMed.',
     siteName: 'FlashMed',
     type: 'website',
+    url: 'https://flashmed.in/vlogs',
   },
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+
+// ISR: regenerate at most every hour
+export const revalidate = 3600;
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.flashmed.in';
 
 interface Vlog {
   id: string;
+  slug?: string;
   title: string;
   category: string;
   body: string;
@@ -33,8 +39,7 @@ async function fetchVlogs(page = 1): Promise<{ data: Vlog[]; meta: { total: numb
   const serverApiUrl = process.env.BACKEND_URL || 'https://medicine-app-backend-production.up.railway.app';
   try {
     const res = await fetch(`${serverApiUrl}/api/marketing/vlogs?page=${page}&limit=12`, {
-      next: { revalidate: 0 },
-      cache: 'no-store',
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return { data: [], meta: { total: 0, totalPages: 0 } };
     return res.json();

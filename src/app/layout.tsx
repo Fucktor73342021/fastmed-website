@@ -76,7 +76,8 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
   },
   manifest: '/manifest.webmanifest',
-  alternates: { canonical: APP_URL },
+  // NOTE: No root-level canonical here — each page sets its own via generateMetadata
+  // so Google assigns the correct canonical URL to each article/vlog/faq page.
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

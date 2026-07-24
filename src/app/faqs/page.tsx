@@ -5,16 +5,21 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'FAQs | FlashMed — Frequently Asked Questions',
   description: 'Find answers to common questions about FlashMed — medicine delivery, doctor bookings, pharmacy, prescriptions, and more.',
+  alternates: {
+    canonical: 'https://flashmed.in/faqs',
+  },
   openGraph: {
     title: 'FAQs | FlashMed',
     description: 'Frequently asked questions about FlashMed services.',
     siteName: 'FlashMed',
     type: 'website',
+    url: 'https://flashmed.in/faqs',
   },
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+
+// ISR: regenerate at most every hour
+export const revalidate = 3600;
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.flashmed.in';
 
@@ -32,8 +37,7 @@ async function fetchFaqs(): Promise<{ data: FAQ[] }> {
   const serverApiUrl = process.env.BACKEND_URL || 'https://medicine-app-backend-production.up.railway.app';
   try {
     const res = await fetch(`${serverApiUrl}/api/marketing/faqs?limit=50`, {
-      next: { revalidate: 0 },
-      cache: 'no-store',
+      next: { revalidate: 3600 },
     });
     if (!res.ok) return { data: [] };
     return res.json();

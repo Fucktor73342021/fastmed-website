@@ -5,13 +5,18 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Health Articles | FlashMed',
   description: 'Read the latest health articles, tips, and medical insights from the FlashMed team. Stay informed about pharmacy, doctors, labs, and wellness.',
+  alternates: {
+    canonical: 'https://flashmed.in/articles',
+  },
   openGraph: {
     title: 'Health Articles | FlashMed',
     description: 'Latest health articles from FlashMed — your trusted medical delivery platform.',
     siteName: 'FlashMed',
     type: 'website',
+    url: 'https://flashmed.in/articles',
   },
 };
+
 
 // ISR: regenerate listing page at most every hour — gives Google fast cached HTML
 export const revalidate = 3600;
