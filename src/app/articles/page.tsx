@@ -125,41 +125,44 @@ export default async function ArticlesPage() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
             {articles.map((article) => (
-              <article key={article.id} style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                borderRadius: 16,
-                overflow: 'hidden',
-                transition: 'transform 0.2s, border-color 0.2s',
-              }}
-              >
-                {article.photos?.[0] && (
-                  <div style={{ width: '100%', height: 200, overflow: 'hidden' }}>
-                    <img src={article.photos[0]} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Link key={article.id} href={`/articles/${article.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+                <article style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  height: '100%',
+                  cursor: 'pointer',
+                }}
+                >
+                  {article.photos?.[0] && (
+                    <div style={{ width: '100%', height: 200, overflow: 'hidden' }}>
+                      <img src={article.photos[0]} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  )}
+                  <div style={{ padding: 24 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                      <span style={{
+                        background: `${CATEGORY_COLORS[article.category] || '#64748b'}20`,
+                        color: CATEGORY_COLORS[article.category] || '#94a3b8',
+                        border: `1px solid ${CATEGORY_COLORS[article.category] || '#64748b'}40`,
+                        padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                      }}>{article.category}</span>
+                      <span style={{ color: '#475569', fontSize: 12, marginLeft: 'auto' }}>{formatDate(article.publishedAt)}</span>
+                    </div>
+                    <h2 style={{ fontSize: 17, fontWeight: 700, color: '#f1f5f9', margin: '0 0 10px', lineHeight: 1.4 }}>
+                      {article.title}
+                    </h2>
+                    <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.6, margin: '0 0 16px' }}>
+                      {stripHtml(article.body).substring(0, 120)}…
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#475569', fontSize: 12 }}>By {article.authorName}</span>
+                      <span style={{ color: '#10b981', fontSize: 13, fontWeight: 600 }}>Read more →</span>
+                    </div>
                   </div>
-                )}
-                <div style={{ padding: 24 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <span style={{
-                      background: `${CATEGORY_COLORS[article.category] || '#64748b'}20`,
-                      color: CATEGORY_COLORS[article.category] || '#94a3b8',
-                      border: `1px solid ${CATEGORY_COLORS[article.category] || '#64748b'}40`,
-                      padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-                    }}>{article.category}</span>
-                    <span style={{ color: '#475569', fontSize: 12, marginLeft: 'auto' }}>{formatDate(article.publishedAt)}</span>
-                  </div>
-                  <h2 style={{ fontSize: 17, fontWeight: 700, color: '#f1f5f9', margin: '0 0 10px', lineHeight: 1.4 }}>
-                    {article.title}
-                  </h2>
-                  <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.6, margin: '0 0 16px' }}>
-                    {stripHtml(article.body)}…
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#475569', fontSize: 12 }}>By {article.authorName}</span>
-                    <span style={{ color: '#10b981', fontSize: 13, fontWeight: 600 }}>Read more →</span>
-                  </div>
-                </div>
-              </article>
+                </article>
+              </Link>
             ))}
           </div>
         )}
