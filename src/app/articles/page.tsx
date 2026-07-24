@@ -13,13 +13,14 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// ISR: regenerate listing page at most every hour — gives Google fast cached HTML
+export const revalidate = 3600;
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.flashmed.in';
 
 interface Article {
   id: string;
+  slug?: string;
   title: string;
   category: string;
   body: string;
@@ -34,8 +35,7 @@ async function fetchArticles(page = 1): Promise<{ data: Article[]; meta: { total
   const serverApiUrl = process.env.BACKEND_URL || 'https://medicine-app-backend-production.up.railway.app';
   try {
     const res = await fetch(`${serverApiUrl}/api/marketing/articles?page=${page}&limit=12`, {
-      next: { revalidate: 0 },
-      cache: 'no-store',
+      next: { revalidate: 3600 }, // ISR: cache for 1 hour, then re-fetch
       headers: {
         'Accept': 'application/json',
         'User-Agent': 'FlashMed-Web/1.0 (+https://flashmed.in)',
@@ -125,7 +125,7 @@ export default async function ArticlesPage() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
             {articles.map((article) => (
-              <Link key={article.id} href={`/articles/${article.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+              <Link key={article.id} href={`/articles/${article.slug || article.id}`} style={{ textDecoration: 'none', display: 'block' }}>
                 <article style={{
                   background: 'rgba(255,255,255,0.03)',
                   border: '1px solid rgba(255,255,255,0.07)',
