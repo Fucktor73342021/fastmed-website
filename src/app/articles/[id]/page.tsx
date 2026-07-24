@@ -25,17 +25,32 @@ interface Article {
 }
 
 async function fetchArticle(slugOrId: string): Promise<Article | null> {
-  try {
-    const res = await fetch(`${SERVER_API}/api/marketing/articles/${slugOrId}`, {
-      cache: 'no-store',
-      headers: { 'Accept': 'application/json' },
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.data || json;
-  } catch {
-    return null;
+  const url = `${SERVER_API}/api/marketing/articles/${slugOrId}`;
+  // Retry once — Railway may be cold-starting
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!res.ok) {
+        console.error(`[Article] Attempt ${attempt}: ${url} → HTTP ${res.status}`);
+        if (attempt === 2) return null;
+        continue;
+      }
+      const json = await res.json();
+      return json.data || json;
+    } catch (err) {
+      console.error(`[Article] Attempt ${attempt}: fetch failed for ${url}:`, err);
+      if (attempt === 2) return null;
+      await new Promise(r => setTimeout(r, 500)); // wait 500ms before retry
+    }
   }
+  return null;
 }
 
 // ── Metadata (for Google's title/description in search results) ─────────────
