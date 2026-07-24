@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.flashmed.in';
 
 interface Vlog {
@@ -29,7 +32,8 @@ interface Vlog {
 async function fetchVlogs(page = 1): Promise<{ data: Vlog[]; meta: { total: number; totalPages: number } }> {
   try {
     const res = await fetch(`${API_BASE}/api/marketing/vlogs?page=${page}&limit=12`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 0 },
+      cache: 'no-store',
     });
     if (!res.ok) return { data: [], meta: { total: 0, totalPages: 0 } };
     return res.json();

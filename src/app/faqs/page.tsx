@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.flashmed.in';
 
 interface FAQ {
@@ -28,7 +31,8 @@ interface FAQ {
 async function fetchFaqs(): Promise<{ data: FAQ[] }> {
   try {
     const res = await fetch(`${API_BASE}/api/marketing/faqs?limit=50`, {
-      next: { revalidate: 600 }, // 10-minute ISR for FAQs
+      next: { revalidate: 0 },
+      cache: 'no-store',
     });
     if (!res.ok) return { data: [] };
     return res.json();

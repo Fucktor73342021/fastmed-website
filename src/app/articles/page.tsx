@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.flashmed.in';
 
 interface Article {
@@ -28,7 +31,8 @@ interface Article {
 async function fetchArticles(page = 1): Promise<{ data: Article[]; meta: { total: number; totalPages: number } }> {
   try {
     const res = await fetch(`${API_BASE}/api/marketing/articles?page=${page}&limit=12`, {
-      next: { revalidate: 60 }, // ISR — revalidate every 60 seconds
+      next: { revalidate: 0 }, // always fetch fresh
+      cache: 'no-store',
     });
     if (!res.ok) return { data: [], meta: { total: 0, totalPages: 0 } };
     return res.json();
