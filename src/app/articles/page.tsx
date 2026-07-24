@@ -29,14 +29,21 @@ interface Article {
 }
 
 async function fetchArticles(page = 1): Promise<{ data: Article[]; meta: { total: number; totalPages: number } }> {
+  const apiUrl = 'https://api.flashmed.in';
   try {
-    const res = await fetch(`${API_BASE}/api/marketing/articles?page=${page}&limit=12`, {
-      next: { revalidate: 0 }, // always fetch fresh
+    const res = await fetch(`${apiUrl}/api/marketing/articles?page=${page}&limit=12`, {
+      next: { revalidate: 0 },
       cache: 'no-store',
     });
-    if (!res.ok) return { data: [], meta: { total: 0, totalPages: 0 } };
-    return res.json();
-  } catch {
+    if (!res.ok) {
+      console.error(`[Articles] API returned ${res.status}: ${await res.text().catch(() => '')}`);
+      return { data: [], meta: { total: 0, totalPages: 0 } };
+    }
+    const json = await res.json();
+    console.log(`[Articles] Fetched ${json.data?.length ?? 0} articles from DB`);
+    return json;
+  } catch (err: unknown) {
+    console.error('[Articles] Fetch error:', err instanceof Error ? err.message : String(err));
     return { data: [], meta: { total: 0, totalPages: 0 } };
   }
 }
