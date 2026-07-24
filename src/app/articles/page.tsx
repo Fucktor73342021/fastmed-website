@@ -77,9 +77,10 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default async function ArticlesPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const page = parseInt(searchParams.page || '1', 10);
+  const params = await searchParams;
+  const page = parseInt(params.page || '1', 10);
   const { data: articles, meta } = await fetchArticles(page);
 
   return (
