@@ -112,10 +112,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       images: [ogImage],
     },
-    // Inject JSON-LD into <head> via Next.js metadata 'other' — visible in SSR HTML
-    other: {
-      'script:ld+json': JSON.stringify(jsonLd),
-    },
   };
 }
 
@@ -159,9 +155,33 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   const canonicalUrl = `${SITE_URL}/articles/${canonicalSlug}`;
   const bodyWithLinks = applyLinkedWords(article.body, article.keywords);
 
+  // JSON-LD structured data — Google reads this from body fine
+  const plainText = article.body.replace(/<[^>]*>/g, '').trim();
+  const description = plainText.substring(0, 155);
+  const ogImage = article.photos?.[0] || `${SITE_URL}/og-default.png`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description,
+    image: ogImage,
+    author: { '@type': 'Person', name: article.authorName },
+    publisher: { '@type': 'Organization', name: 'FlashMed', logo: { '@type': 'ImageObject', url: `${SITE_URL}/icons/icon-192.png` } },
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt || article.publishedAt,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+    url: canonicalUrl,
+    keywords: [article.category, 'health', 'medicine', 'pharmacy', 'FlashMed'].join(', '),
+    articleSection: article.category,
+    inLanguage: 'en-IN',
+  };
 
   return (
-
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     <div style={{ minHeight: '100vh', background: '#0a0f1a', fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
 
 
@@ -284,5 +304,6 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         <p>© {new Date().getFullYear()} FlashMed. All rights reserved. | <Link href="/" style={{ color: '#10b981', textDecoration: 'none' }}>Home</Link></p>
       </footer>
     </div>
+    </>
   );
 }
