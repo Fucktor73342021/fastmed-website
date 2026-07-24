@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const ogImage = article.photos?.[0] || `${SITE_URL}/og-default.png`;
 
   return {
-    title: `${article.title} | FlashMed`,
+    title: article.title,
     description,
     alternates: { canonical: canonicalUrl },
     openGraph: {
