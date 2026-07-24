@@ -54,13 +54,31 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const canonicalUrl = `${SITE_URL}/articles/${canonicalSlug}`;
   const ogImage = article.photos?.[0] || `${SITE_URL}/og-default.png`;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description,
+    image: ogImage,
+    author: { '@type': 'Person', name: article.authorName },
+    publisher: {
+      '@type': 'Organization',
+      name: 'FlashMed',
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}/icons/icon-192.png` },
+    },
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt || article.publishedAt,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+    url: canonicalUrl,
+    keywords: [article.category, 'health', 'medicine', 'pharmacy', 'FlashMed'].join(', '),
+    articleSection: article.category,
+    inLanguage: 'en-IN',
+  };
+
   return {
     title: `${article.title} | FlashMed`,
     description,
-    // Canonical URL — tells Google the definitive URL for this page
-    alternates: {
-      canonical: canonicalUrl,
-    },
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title: article.title,
       description,
@@ -78,6 +96,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: article.title,
       description,
       images: [ogImage],
+    },
+    // Inject JSON-LD into <head> via Next.js metadata 'other' — visible in SSR HTML
+    other: {
+      'script:ld+json': JSON.stringify(jsonLd),
     },
   };
 }
@@ -122,45 +144,11 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   const canonicalUrl = `${SITE_URL}/articles/${canonicalSlug}`;
   const bodyWithLinks = applyLinkedWords(article.body, article.keywords);
 
-  // JSON-LD structured data — makes Google show rich results (author, date, image)
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: article.title,
-    description: article.body.replace(/<[^>]*>/g, '').substring(0, 155),
-    image: article.photos?.[0] || `${SITE_URL}/og-default.png`,
-    author: {
-      '@type': 'Person',
-      name: article.authorName,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'FlashMed',
-      logo: {
-        '@type': 'ImageObject',
-        url: `${SITE_URL}/icons/icon-192.png`,
-      },
-    },
-    datePublished: article.publishedAt,
-    dateModified: article.updatedAt || article.publishedAt,
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': canonicalUrl,
-    },
-    url: canonicalUrl,
-    keywords: [article.category, 'health', 'medicine', 'pharmacy', 'FlashMed'].join(', '),
-    articleSection: article.category,
-    inLanguage: 'en-IN',
-  };
 
   return (
+
     <div style={{ minHeight: '100vh', background: '#0a0f1a', fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
 
-      {/* JSON-LD Structured Data — parsed by Google for rich results */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       {/* Header */}
       <header style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(10,15,26,0.95)', backdropFilter: 'blur(12px)', position: 'sticky', top: 0, zIndex: 50 }}>
