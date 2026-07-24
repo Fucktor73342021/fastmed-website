@@ -54,14 +54,8 @@ function getYouTubeId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-export default async function VlogsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
-  const params = await searchParams;
-  const page = parseInt(params.page || '1', 10);
-  const { data: vlogs, meta } = await fetchVlogs(page);
+export default async function VlogsPage() {
+  const { data: vlogs, meta } = await fetchVlogs(1);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0f1a', fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>

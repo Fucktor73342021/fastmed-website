@@ -74,14 +74,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   general: '#64748b',
 };
 
-export default async function ArticlesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
-  const params = await searchParams;
-  const page = parseInt(params.page || '1', 10);
-  const { data: articles, meta } = await fetchArticles(page);
+export default async function ArticlesPage() {
+  const { data: articles, meta } = await fetchArticles(1);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0f1a', fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
