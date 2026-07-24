@@ -107,35 +107,38 @@ export default async function VlogsPage() {
             {vlogs.map((vlog) => {
               const ytId = getYouTubeId(vlog.url || '');
               const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : vlog.photos?.[0];
+              const cardHref = vlog.url || `/vlogs`;
               return (
-                <article key={vlog.id} style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.07)',
-                  borderRadius: 16, overflow: 'hidden',
-                }}>
-                  {/* Thumbnail */}
-                  <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#1e293b', cursor: 'pointer' }}
-                    onClick={() => vlog.url && window.open(vlog.url, '_blank')}>
-                    {thumb ? (
-                      <img src={thumb} alt={vlog.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>🎬</div>
-                    )}
-                    {vlog.url && (
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
-                        <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>▶</div>
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ padding: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                      <span style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)', padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{vlog.category}</span>
-                      <span style={{ color: '#475569', fontSize: 12, marginLeft: 'auto' }}>{formatDate(vlog.publishedAt)}</span>
+                <a key={vlog.id} href={cardHref} target={vlog.url ? '_blank' : '_self'} rel="noopener noreferrer"
+                  style={{ textDecoration: 'none', display: 'block' }}>
+                  <article style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                    borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                  }}>
+                    {/* Thumbnail */}
+                    <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#1e293b' }}>
+                      {thumb ? (
+                        <img src={thumb} alt={vlog.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>🎬</div>
+                      )}
+                      {vlog.url && (
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
+                          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>▶</div>
+                        </div>
+                      )}
                     </div>
-                    <h2 style={{ fontSize: 16, fontWeight: 700, color: '#f1f5f9', margin: '0 0 8px', lineHeight: 1.4 }}>{vlog.title}</h2>
-                    <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>By {vlog.authorName}</p>
-                  </div>
-                </article>
+                    <div style={{ padding: 20 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                        <span style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)', padding: '3px 10px', borderRadius: 100, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>{vlog.category}</span>
+                        <span style={{ color: '#475569', fontSize: 12, marginLeft: 'auto' }}>{formatDate(vlog.publishedAt)}</span>
+                      </div>
+                      <h2 style={{ fontSize: 16, fontWeight: 700, color: '#f1f5f9', margin: '0 0 8px', lineHeight: 1.4 }}>{vlog.title}</h2>
+                      <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>By {vlog.authorName}</p>
+                    </div>
+                  </article>
+                </a>
               );
             })}
           </div>
