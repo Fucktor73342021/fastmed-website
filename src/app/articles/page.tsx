@@ -75,7 +75,8 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export default async function ArticlesPage() {
-  const { data: articles, meta } = await fetchArticles(1);
+  const page = 1;
+  const { data: articles, meta } = await fetchArticles(page);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0f1a', fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>

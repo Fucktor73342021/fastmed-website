@@ -55,7 +55,8 @@ function getYouTubeId(url: string): string | null {
 }
 
 export default async function VlogsPage() {
-  const { data: vlogs, meta } = await fetchVlogs(1);
+  const page = 1;
+  const { data: vlogs, meta } = await fetchVlogs(page);
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0f1a', fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
