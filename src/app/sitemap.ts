@@ -25,12 +25,28 @@ async function fetchAllContent(type: 'articles' | 'vlogs' | 'faqs'): Promise<Con
   }
 }
 
+async function fetchAllDoctors(): Promise<ContentItem[]> {
+  try {
+    const res = await fetch(`${SERVER_API}/api/doctors`, {
+      next: { revalidate: 3600 },
+      headers: { 'Accept': 'application/json', 'User-Agent': 'FlashMed-Sitemap/1.0' },
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return Array.isArray(json.doctors) ? json.doctors : [];
+  } catch {
+    return [];
+  }
+}
+
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   // ── Static pages ────────────────────────────────────────────────────────
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE,                                  lastModified: now, changeFrequency: 'weekly',  priority: 1.0 },
+    { url: `${BASE}/doctors`,                     lastModified: now, changeFrequency: 'daily',   priority: 0.9 },
     { url: `${BASE}/articles`,                    lastModified: now, changeFrequency: 'daily',   priority: 0.9 },
     { url: `${BASE}/vlogs`,                       lastModified: now, changeFrequency: 'daily',   priority: 0.8 },
     { url: `${BASE}/faqs`,                        lastModified: now, changeFrequency: 'weekly',  priority: 0.8 },
@@ -46,10 +62,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // ── Dynamic content — fetch from API ────────────────────────────────────
-  const [articles, vlogs, faqs] = await Promise.all([
+  const [articles, vlogs, faqs, doctors] = await Promise.all([
     fetchAllContent('articles'),
     fetchAllContent('vlogs'),
     fetchAllContent('faqs'),
+    fetchAllDoctors(),
   ]);
 
   const articleEntries: MetadataRoute.Sitemap = articles.map((a) => ({
@@ -74,5 +91,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...articleEntries, ...vlogEntries, ...faqEntries];
+  const doctorEntries: MetadataRoute.Sitemap = doctors.map((d) => ({
+    url: `${BASE}/doctors/${d.id}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+  }));
+
+  return [...staticPages, ...articleEntries, ...vlogEntries, ...faqEntries, ...doctorEntries];
 }
+
