@@ -131,7 +131,7 @@ export async function generateMetadata(
     };
   }
 
-  const title = `Dr. ${doctor.name}${doctor.specialty ? ` — ${doctor.specialty}` : ''} | FlashMed`;
+  const title = `Dr. ${doctor.name}${doctor.specialty ? ` — ${doctor.specialty}` : ''}`;
   const clinic = doctor.clinicName || doctor.clinic?.name || '';
   const city = doctor.location?.city || doctor.location?.district || '';
   const desc = [

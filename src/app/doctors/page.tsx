@@ -34,7 +34,7 @@ const BACKEND = process.env.BACKEND_URL || 'https://medicine-app-backend-product
 const BASE_URL = 'https://flashmed.in';
 
 export const metadata: Metadata = {
-  title: 'Find Doctors | FlashMed — Book Doctor Appointments Online',
+  title: 'Find Doctors — Book Doctor Appointments Online',
   description:
     'Find and book trusted doctors near you on FlashMed. Browse General Physicians, Specialists, Dermatologists, and more. Instant appointment booking via the FlashMed app.',
   alternates: { canonical: `${BASE_URL}/doctors` },
