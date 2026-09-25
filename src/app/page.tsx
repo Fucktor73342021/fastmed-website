@@ -48,7 +48,7 @@ const VEC = {
   warning:     '/vectors/warning.svg',
   close:       '/vectors/close.svg',
   download:    '/vectors/download.svg',
-  logo:        '/vectors/flashmed-logo.svg',
+  logo:        '/vectors/flashmed-logo.png',
 } as const;
 
 // ─── Inline SVG components for tab icons (scalable, no extra requests) ────────
@@ -523,25 +523,17 @@ export default function LandingPage() {
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
       }}>
-        {/* Logo — vector image + text */}
+        {/* Logo — real FlashMed capsule logo (transparent background) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 22, color: '#1a1a2e' }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: 14,
-            background: 'linear-gradient(135deg, #1a6bcc, #145bb3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 8px 24px rgba(26,107,204,0.28)',
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}>
-            <Image
-              src={VEC.logo}
-              alt="FlashMed"
-              width={32}
-              height={32}
-              unoptimized
-              style={{ objectFit: 'contain' }}
-            />
-          </div>
+          <Image
+            src={VEC.logo}
+            alt="FlashMed"
+            width={44}
+            height={44}
+            unoptimized
+            priority
+            style={{ objectFit: 'contain', flexShrink: 0 }}
+          />
           FlashMed
         </div>
         {/* Only "Get Started" */}
@@ -758,14 +750,7 @@ export default function LandingPage() {
           {/* Brand */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <div style={{
-                width: 38, height: 38, borderRadius: 12,
-                background: 'linear-gradient(135deg, #1a6bcc, #145bb3)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                overflow: 'hidden', flexShrink: 0,
-              }}>
-                <Image src={VEC.logo} alt="FlashMed" width={28} height={28} unoptimized style={{ objectFit: 'contain' }}/>
-              </div>
+              <Image src={VEC.logo} alt="FlashMed" width={38} height={38} unoptimized style={{ objectFit: 'contain', flexShrink: 0 }}/>
               <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 18, color: '#1a1a2e' }}>FlashMed</span>
             </div>
             <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6, maxWidth: 200 }}>

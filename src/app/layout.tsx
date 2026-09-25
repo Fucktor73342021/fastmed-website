@@ -21,7 +21,7 @@ const outfit = Outfit({
 const APP_URL = 'https://flashmed.in';
 
 export const viewport: Viewport = {
-  themeColor: '#059669',
+  themeColor: '#1a6bcc',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
@@ -69,11 +69,16 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icons/icon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/icons/icon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon.ico',           sizes: 'any',    type: 'image/x-icon' },
+      { url: '/icons/icon-32x32.png',  sizes: '32x32',  type: 'image/png'   },
+      { url: '/icons/icon-16x16.png',  sizes: '16x16',  type: 'image/png'   },
+      { url: '/icons/icon-192x192.png',sizes: '192x192',type: 'image/png'   },
     ],
-    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180' }],
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     shortcut: '/favicon.ico',
+    other: [
+      { rel: 'icon', url: '/bgless_logo.png', type: 'image/png' },
+    ],
   },
   manifest: '/manifest.webmanifest',
   // NOTE: No root-level canonical here — each page sets its own via generateMetadata
