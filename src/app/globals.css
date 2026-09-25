@@ -1,34 +1,36 @@
 /* ═══════════════════════════════════════════════════════════════════
    FlashMed Patient Web — Global Design System
+   Theme: FlashMed Classic (matches patient app default theme exactly)
    ═══════════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap');
 
-/* ── CSS Custom Properties (Light Mode) ── */
+/* ── CSS Custom Properties (Light Mode — FlashMed Classic Blue Theme) ── */
 :root {
-  --color-bg: #f8fafc;
-  --color-surface: #ffffff;
+  /* Core colors — exact match to app ThemeContext.js default theme */
+  --color-bg: #ffffff;
+  --color-surface: #f8fafd;
   --color-card: #ffffff;
-  --color-primary: #059669;
-  --color-primary-dark: #047857;
-  --color-accent: #6366f1;
+  --color-primary: #1a6bcc;
+  --color-primary-dark: #145bb3;
+  --color-accent: #00aaaa;
   --color-success: #10b981;
-  --color-error: #ef4444;
+  --color-error: #ff4444;
   --color-warning: #f59e0b;
-  --color-info: #3b82f6;
-  --color-text: #0f172a;
+  --color-info: #1a6bcc;
+  --color-text: #1a1a2e;
   --color-text-muted: #64748b;
   --color-text-light: #94a3b8;
   --color-border: #e2e8f0;
   --color-border-strong: #cbd5e1;
-  --color-shadow: rgba(0, 0, 0, 0.08);
-  --color-shadow-strong: rgba(0, 0, 0, 0.15);
-  --color-overlay: rgba(0, 0, 0, 0.5);
-  --color-glass: rgba(255, 255, 255, 0.85);
-  --color-glass-border: rgba(255, 255, 255, 0.4);
-  --color-gradient-1: rgba(5, 150, 105, 0.12);
-  --color-gradient-2: rgba(99, 102, 241, 0.10);
-  --color-gradient-3: rgba(16, 185, 129, 0.08);
+  --color-shadow: rgba(15, 23, 42, 0.08);
+  --color-shadow-strong: rgba(15, 23, 42, 0.15);
+  --color-overlay: rgba(15, 23, 42, 0.50);
+  --color-glass: rgba(255, 255, 255, 0.92);
+  --color-glass-border: rgba(26, 107, 204, 0.15);
+  --color-gradient-1: rgba(26, 107, 204, 0.10);
+  --color-gradient-2: rgba(0, 170, 170, 0.08);
+  --color-gradient-3: rgba(26, 107, 204, 0.06);
 
   --sidebar-width: 240px;
   --sidebar-collapsed: 64px;
@@ -48,12 +50,12 @@
   --transition-normal: 250ms ease;
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
-  --shadow-lg: 0 12px 32px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-xl: 0 24px 48px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.08);
-  --shadow-primary: 0 8px 24px rgba(5, 150, 105, 0.25);
-  --shadow-glow: 0 0 32px rgba(5, 150, 105, 0.20);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.10), 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-xl: 0 24px 48px rgba(15, 23, 42, 0.12), 0 8px 20px rgba(15, 23, 42, 0.08);
+  --shadow-primary: 0 8px 24px rgba(26, 107, 204, 0.28);
+  --shadow-glow: 0 0 32px rgba(26, 107, 204, 0.22);
 }
 
 /* ── Dark Mode ── */
@@ -70,12 +72,12 @@
   --color-shadow-strong: rgba(0, 0, 0, 0.60);
   --color-overlay: rgba(0, 0, 0, 0.72);
   --color-glass: rgba(26, 34, 54, 0.90);
-  --color-glass-border: rgba(255, 255, 255, 0.08);
-  --color-gradient-1: rgba(5, 150, 105, 0.18);
-  --color-gradient-2: rgba(99, 102, 241, 0.15);
-  --color-gradient-3: rgba(16, 185, 129, 0.10);
-  --shadow-primary: 0 8px 24px rgba(5, 150, 105, 0.35);
-  --shadow-glow: 0 0 40px rgba(5, 150, 105, 0.30);
+  --color-glass-border: rgba(26, 107, 204, 0.20);
+  --color-gradient-1: rgba(26, 107, 204, 0.18);
+  --color-gradient-2: rgba(0, 170, 170, 0.12);
+  --color-gradient-3: rgba(26, 107, 204, 0.08);
+  --shadow-primary: 0 8px 24px rgba(26, 107, 204, 0.38);
+  --shadow-glow: 0 0 40px rgba(26, 107, 204, 0.30);
 }
 
 /* ── Base Reset ── */
@@ -126,23 +128,23 @@ img { max-width: 100%; }
   animation: meshFloat 15s ease-in-out infinite alternate;
 }
 .mesh-gradient::before {
-  width: 600px; height: 600px;
+  width: 700px; height: 700px;
   background: var(--color-gradient-1);
-  top: -200px; left: -200px;
+  top: -250px; left: -250px;
 }
 .mesh-gradient::after {
-  width: 500px; height: 500px;
+  width: 600px; height: 600px;
   background: var(--color-gradient-2);
-  bottom: -150px; right: -150px;
+  bottom: -180px; right: -180px;
   animation-delay: -7s;
   animation-duration: 12s;
 }
 .mesh-orb-3 {
   position: absolute;
-  width: 400px; height: 400px;
+  width: 500px; height: 500px;
   border-radius: 50%;
   background: var(--color-gradient-3);
-  filter: blur(60px);
+  filter: blur(70px);
   top: 40%; left: 30%;
   animation: meshFloat2 18s ease-in-out infinite alternate;
 }
@@ -154,6 +156,78 @@ img { max-width: 100%; }
 @keyframes meshFloat2 {
   0% { transform: translate(0, 0) scale(1); }
   100% { transform: translate(-40px, 60px) scale(0.9); }
+}
+
+/* ══════════════════════════════════════
+   ANIMATED BUBBLE FIELD (matches patient app MeshGradient)
+   Floating blurred orbs over white background
+   ══════════════════════════════════════ */
+.bubble-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.bubble-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(56px);
+  will-change: transform;
+}
+.bubble-orb-1 {
+  width: 520px; height: 520px;
+  background: rgba(26, 107, 204, 0.10);
+  top: -160px; left: -120px;
+  animation: bubbleFloat1 16s ease-in-out infinite alternate;
+}
+.bubble-orb-2 {
+  width: 440px; height: 440px;
+  background: rgba(0, 170, 170, 0.08);
+  top: 10%; right: -140px;
+  animation: bubbleFloat2 13s ease-in-out infinite alternate;
+  animation-delay: -4s;
+}
+.bubble-orb-3 {
+  width: 380px; height: 380px;
+  background: rgba(16, 185, 129, 0.07);
+  bottom: 15%; left: -80px;
+  animation: bubbleFloat3 20s ease-in-out infinite alternate;
+  animation-delay: -8s;
+}
+.bubble-orb-4 {
+  width: 460px; height: 460px;
+  background: rgba(124, 58, 237, 0.06);
+  bottom: -120px; right: -100px;
+  animation: bubbleFloat1 17s ease-in-out infinite alternate;
+  animation-delay: -12s;
+}
+.bubble-orb-5 {
+  width: 300px; height: 300px;
+  background: rgba(26, 107, 204, 0.07);
+  top: 42%; left: 35%;
+  animation: bubbleFloat2 22s ease-in-out infinite alternate;
+  animation-delay: -6s;
+}
+
+@keyframes bubbleFloat1 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(50px, 45px) scale(1.08); }
+}
+@keyframes bubbleFloat2 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(-40px, 55px) scale(0.92); }
+}
+@keyframes bubbleFloat3 {
+  0%   { transform: translate(0px, 0px) scale(1); }
+  100% { transform: translate(35px, -45px) scale(1.06); }
+}
+
+/* Reduced-motion: keep orbs static for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .bubble-orb, .mesh-gradient::before, .mesh-gradient::after, .mesh-orb-3 {
+    animation: none !important;
+  }
 }
 
 /* ══════════════════════════════════════
@@ -275,7 +349,7 @@ img { max-width: 100%; }
 .input {
   width: 100%;
   padding: 13px 16px;
-  background: var(--color-surface);
+  background: var(--color-card);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: 15px;
@@ -286,7 +360,7 @@ img { max-width: 100%; }
 .input::placeholder { color: var(--color-text-light); }
 .input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+  box-shadow: 0 0 0 3px rgba(26, 107, 204, 0.12);
 }
 .input:focus-visible { outline: none; }
 
@@ -424,7 +498,7 @@ img { max-width: 100%; }
 }
 .nav-item:hover { background: var(--color-surface); color: var(--color-text); }
 .nav-item.active {
-  background: rgba(5, 150, 105, 0.12);
+  background: rgba(26, 107, 204, 0.10);
   color: var(--color-primary);
 }
 .nav-item.active::before {
@@ -526,7 +600,7 @@ img { max-width: 100%; }
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: var(--color-surface);
+  background: var(--color-card);
   border: 1.5px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -599,7 +673,7 @@ img { max-width: 100%; }
 .bottom-nav-item.active { color: var(--color-primary); }
 .bottom-nav-icon { font-size: 22px; }
 .bottom-nav-item.active .bottom-nav-icon {
-  filter: drop-shadow(0 0 6px rgba(5, 150, 105, 0.5));
+  filter: drop-shadow(0 0 6px rgba(26, 107, 204, 0.50));
   transform: scale(1.1);
 }
 
@@ -824,7 +898,7 @@ img { max-width: 100%; }
   align-items: center;
   gap: 16px;
   width: 300px;
-  border: 1.5px solid rgba(5,150,105,0.20);
+  border: 1.5px solid rgba(26, 107, 204, 0.20);
   box-shadow: var(--shadow-xl);
   position: relative;
   overflow: hidden;
@@ -872,8 +946,8 @@ img { max-width: 100%; }
 .badge-confirmed { background: rgba(16,185,129,0.12); color: #059669; }
 .badge-delivered { background: rgba(16,185,129,0.15); color: #047857; }
 .badge-cancelled { background: rgba(239,68,68,0.12); color: #dc2626; }
-.badge-processing { background: rgba(99,102,241,0.12); color: #6366f1; }
-.badge-new { background: #00d26a; color: white; font-size: 10px; }
+.badge-processing { background: rgba(26,107,204,0.12); color: #1a6bcc; }
+.badge-new { background: #1a6bcc; color: white; font-size: 10px; }
 
 /* ══════════════════════════════════════
    DIVIDER
@@ -908,7 +982,7 @@ img { max-width: 100%; }
 }
 .upload-zone:hover, .upload-zone.drag-over {
   border-color: var(--color-primary);
-  background: rgba(5, 150, 105, 0.04);
+  background: rgba(26, 107, 204, 0.04);
 }
 .upload-icon { font-size: 40px; margin-bottom: 12px; }
 .upload-title { font-size: 15px; font-weight: 700; color: var(--color-text); margin-bottom: 4px; }
@@ -1098,7 +1172,7 @@ img { max-width: 100%; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-text-light); }
 
 /* ── Selection ── */
-::selection { background: rgba(5, 150, 105, 0.2); color: var(--color-text); }
+::selection { background: rgba(26, 107, 204, 0.18); color: var(--color-text); }
 
 /* Utility classes */
 .flex { display: flex; }
